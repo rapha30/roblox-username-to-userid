@@ -1,17 +1,17 @@
-// username-to-userid: converte usernames do Roblox em userIDs.
+// username-to-userid: converts Roblox usernames into userIDs.
 //
-// Usa a API publica oficial da Roblox (sem API key, sem browser):
+// Uses the official public Roblox API (no API key, no browser):
 //   POST https://users.roblox.com/v1/usernames/users
 //
-// Uso:
-//   1) Cole os usernames (um por linha), termine com uma linha vazia ou Ctrl+Z+Enter (Win) / Ctrl+D (Unix)
-//   2) Ou passe por arquivo:   go run . < lista.txt
-//   3) Ou como argumentos:     go run . AceFaaam DashBl0xRBX
+// Usage:
+//   1) Paste usernames (one per line), finish with an empty line or Ctrl+Z+Enter (Win) / Ctrl+D (Unix)
+//   2) Or via file:        username-to-userid.exe < list.txt
+//   3) Or as arguments:    username-to-userid.exe AceFaaam DashBl0xRBX
 //
-// Depois do resultado, um menu permite:
-//   - "all"  -> copia TODOS os resultados pro clipboard
-//   - numero -> copia so o userid daquela linha
-//   - "q"    -> sair
+// After the results, a menu lets you:
+//   - "all"   -> copy ALL results to the clipboard
+//   - number  -> copy just that line's userID
+//   - "q"     -> quit
 package main
 
 import (
@@ -47,13 +47,13 @@ type result struct {
 func main() {
 	usernames := readUsernames()
 	if len(usernames) == 0 {
-		fmt.Println("Nenhum username informado.")
+		fmt.Println("No usernames provided.")
 		return
 	}
 
 	results, err := lookup(usernames)
 	if err != nil {
-		fmt.Println("Erro na consulta:", err)
+		fmt.Println("Lookup error:", err)
 		os.Exit(1)
 	}
 
@@ -61,12 +61,12 @@ func main() {
 	interactiveMenu(results)
 }
 
-// readUsernames: pega de argumentos OU do stdin (uma por linha, para na linha vazia).
+// readUsernames: reads from arguments OR stdin (one per line, stops on empty line).
 func readUsernames() []string {
 	if len(os.Args) > 1 {
 		return cleanList(os.Args[1:])
 	}
-	fmt.Println("Cole os usernames (um por linha). Linha vazia para finalizar:")
+	fmt.Println("Paste usernames (one per line). Empty line to finish:")
 	var raw []string
 	sc := bufio.NewScanner(os.Stdin)
 	for sc.Scan() {
@@ -93,7 +93,7 @@ func cleanList(in []string) []string {
 	return out
 }
 
-// lookup: consulta a API em lotes de 100 (limite da API) e preserva a ordem de entrada.
+// lookup: queries the API in batches of 100 (API limit) and preserves input order.
 func lookup(usernames []string) ([]result, error) {
 	found := map[string]int64{} // chave = lower(name)
 	client := &http.Client{Timeout: 15 * time.Second}
@@ -124,7 +124,7 @@ func lookup(usernames []string) ([]result, error) {
 			return nil, fmt.Errorf("decode: %w", err)
 		}
 		for _, d := range ar.Data {
-			// a API casa por nome real (case-insensitive); guarda pelo username pedido tambem
+			// the API matches by real name (case-insensitive); also store by requested username
 			found[strings.ToLower(d.RequestedUsername)] = d.ID
 			found[strings.ToLower(d.Name)] = d.ID
 		}
@@ -140,7 +140,7 @@ func lookup(usernames []string) ([]result, error) {
 func printResults(results []result) {
 	fmt.Println()
 	for i, r := range results {
-		val := "NAO ENCONTRADO"
+		val := "NOT FOUND"
 		if r.UserID != 0 {
 			val = strconv.FormatInt(r.UserID, 10)
 		}
@@ -150,7 +150,7 @@ func printResults(results []result) {
 }
 
 func interactiveMenu(results []result) {
-	fmt.Println("Comandos: [all] copiar todos | [numero] copiar 1 | [q] sair")
+	fmt.Println("Commands: [all] copy all | [number] copy one | [q] quit")
 	sc := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("> ")
@@ -167,29 +167,29 @@ func interactiveMenu(results []result) {
 				if r.UserID != 0 {
 					fmt.Fprintf(&b, "userid -> %s = %d\n", r.Username, r.UserID)
 				} else {
-					fmt.Fprintf(&b, "userid -> %s = NAO ENCONTRADO\n", r.Username)
+					fmt.Fprintf(&b, "userid -> %s = NOT FOUND\n", r.Username)
 				}
 			}
 			copyClipboard(b.String())
-			fmt.Println("Copiado: todos os resultados.")
+			fmt.Println("Copied: all results.")
 		default:
 			n, err := strconv.Atoi(cmd)
 			if err != nil || n < 1 || n > len(results) {
-				fmt.Println("Comando invalido.")
+				fmt.Println("Invalid command.")
 				continue
 			}
 			r := results[n-1]
 			if r.UserID == 0 {
-				fmt.Println("Esse username nao foi encontrado.")
+				fmt.Println("That username was not found.")
 				continue
 			}
 			copyClipboard(strconv.FormatInt(r.UserID, 10))
-			fmt.Printf("Copiado: %d (%s)\n", r.UserID, r.Username)
+			fmt.Printf("Copied: %d (%s)\n", r.UserID, r.Username)
 		}
 	}
 }
 
-// copyClipboard: usa o utilitario nativo de cada SO (sem dependencias externas).
+// copyClipboard: uses each OS's native utility (no external dependencies).
 func copyClipboard(s string) {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
@@ -202,6 +202,6 @@ func copyClipboard(s string) {
 	}
 	cmd.Stdin = strings.NewReader(s)
 	if err := cmd.Run(); err != nil {
-		fmt.Println("(aviso: nao consegui copiar pro clipboard:", err, ")")
+		fmt.Println("(warning: could not copy to clipboard:", err, ")")
 	}
 }

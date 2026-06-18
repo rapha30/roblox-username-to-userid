@@ -1,20 +1,20 @@
 # Roblox Username → UserID
 
-Converte usernames do Roblox em userIDs usando a **API oficial** da Roblox (`users.roblox.com`). Sem login, sem API key, sem browser — instantâneo.
+Convert Roblox usernames into userIDs using the **official Roblox API** (`users.roblox.com`). No login, no API key, no browser — instant.
 
 ## Download
 
-➡️ **[Baixar username-to-userid.exe](../../releases/latest)** (Windows, standalone — não precisa instalar nada)
+➡️ **[Download username-to-userid.exe](../../releases/latest)** (Windows, standalone — nothing to install)
 
-## Como usar
+## How to use
 
-Abra o `.exe` e escolha uma das formas:
+Open the `.exe` and pick one of these:
 
-1. **Colar lista**: rode o programa, cole os usernames (um por linha) e dê Enter numa linha vazia.
-2. **Arquivo**: `username-to-userid.exe < lista.txt`
-3. **Argumentos**: `username-to-userid.exe AceFaaam DashBl0xRBX`
+1. **Paste a list**: run the program, paste usernames (one per line), then press Enter on an empty line.
+2. **File**: `username-to-userid.exe < list.txt`
+3. **Arguments**: `username-to-userid.exe AceFaaam DashBl0xRBX`
 
-### Saída
+### Output
 
 ```
 [1] userid -> AceFaaam = 10468392042
@@ -22,15 +22,15 @@ Abra o `.exe` e escolha uma das formas:
 [3] userid -> Dreamydin0Pixel = 10351452559
 ```
 
-### Comandos no menu
+### Menu commands
 
-- `all` — copia **todos** os resultados pro clipboard
-- `1`, `2`, `3`... — copia o userID daquela linha
-- `q` — sair
+- `all` — copy **all** results to the clipboard
+- `1`, `2`, `3`... — copy that line's userID
+- `q` — quit
 
-## Build a partir do código
+## Build from source
 
-Requer [Go](https://go.dev/dl/) 1.21+:
+Requires [Go](https://go.dev/dl/) 1.21+:
 
 ```
 go build -o username-to-userid.exe .
