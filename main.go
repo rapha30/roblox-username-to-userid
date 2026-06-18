@@ -194,7 +194,7 @@ func copyClipboard(s string) {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "windows":
-		cmd = exec.Command("powershell", "-NoProfile", "-Command", "$input | Set-Clipboard")
+		cmd = exec.Command("clip.exe")
 	case "darwin":
 		cmd = exec.Command("pbcopy")
 	default:
